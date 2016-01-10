@@ -1,7 +1,7 @@
 {
   "version": "1.0",
-  "name": "HelloJavascript",
-  "description": "HelloJavascript",
+  "name": "2048",
+  "description": "2048网页版",
   "launch_path": "/index.html",
   "icons": {
     "128": "/res/icon.png"
