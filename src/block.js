@@ -72,7 +72,7 @@ var Block = cc.LayerColor.extend({
         this.fake_value = value;
     },
     clone: function() {
-        var b = new Block(this.value, this._contentSize.width, this._contentSize.height);
+        var b = new Block(this.value, this.width, this.height);
         var pos = this.getPosition();
         b.setPosition(pos);
         return b;

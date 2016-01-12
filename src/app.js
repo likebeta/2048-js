@@ -6,6 +6,7 @@ var AppLayer = cc.LayerColor.extend({
         this._super(color, width, height);
 
         var sz = cc.director.getVisibleSize();
+
         var matrix_width = Math.min(sz.width, sz.height);
         var bm = new BlockManager(4, matrix_width, matrix_width);
         bm.setAnchorPoint(cc.p(0, 0));
@@ -45,15 +46,17 @@ var AppLayer = cc.LayerColor.extend({
         cc.eventManager.addListener({
             event: cc.EventListener.TOUCH_ONE_BY_ONE,
             onTouchBegan: function (touch, event) {
+                var node = event.getCurrentTarget();
+                node.begin_pt = touch.getLocation();
                 return true;
             },
             onTouchEnded: function (touch, event) {
-                var now_pt = touch.getLocation();
-                var prev_pt = touch.getStartLocation();
-                //console.log(cc.formatStr('touch: (%d, %d) -> (%d, %d)', prev_pt.x, prev_pt.y, now_pt.x, now_pt.y));
-                var x_axis = now_pt.x - prev_pt.x;
-                var y_axis = now_pt.y - prev_pt.y;
                 var node = event.getCurrentTarget();
+                var end_pt = touch.getLocation();
+                var prev_pt = node.begin_pt;
+                console.log(cc.formatStr('touch: (%d, %d) -> (%d, %d)', prev_pt.x, prev_pt.y, end_pt.x, end_pt.y));
+                var x_axis = end_pt.x - prev_pt.x;
+                var y_axis = end_pt.y - prev_pt.y;
                 var bm = node.getChildByName('block_manager');
                 var block_gap = bm.getBlockGap();
                 if (Math.abs(x_axis) >= Math.abs(y_axis)) {

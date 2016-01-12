@@ -134,6 +134,8 @@ var BlockManager = cc.LayerColor.extend({
             return;
         }
 
+        console.log(direction);
+
         var tmp_blocks = [];
         for (var i = 0; i < this.block_number * this.block_number; ++i) {
             var child = this.getChildByTag(i);
@@ -153,6 +155,7 @@ var BlockManager = cc.LayerColor.extend({
                 break;
             case 'up':
                 result = this.moveUp(tmp_blocks);
+                break;
         }
 
         if (result) {   // vanish block this turn
