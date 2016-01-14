@@ -16,6 +16,7 @@
         "src/app.js",
         "src/block.js",
         "src/blockManager.js",
+        "src/infoWrap.js",
         "src/globals.js"
     ]
 }

@@ -7,7 +7,7 @@ var BlockManager = cc.LayerColor.extend({
         this.block_width = 0;
         this.is_animation = false;
         this.free_blocks = [];
-        this._super(cc.color(0, 0, 0, 0), width, height);
+        this._super(cc.color(187, 170, 160, 255), width, height);
         this.ignoreAnchorPointForPosition(false);
         this.initBlocks();
         return true;
@@ -93,7 +93,7 @@ var BlockManager = cc.LayerColor.extend({
         this.removeFreeBlock(t2);
         blocks[t1].setValue(0);
         blocks[t2].setValue(v1 + v2);
-        return true;
+        return v1 + v2;
     },
     addFreeBlock: function (tag) {
         this.free_blocks.push(tag);
@@ -158,7 +158,7 @@ var BlockManager = cc.LayerColor.extend({
                 break;
         }
 
-        if (result) {   // vanish block this turn
+        if (result.success) {   // vanish block this turn
             this.randomNewBlock();
             if (this.free_blocks.length == 0) {
                 if (!this.moveLeft(tmp_blocks, true) && !this.moveRight(tmp_blocks, true)
@@ -168,10 +168,11 @@ var BlockManager = cc.LayerColor.extend({
                 }
             }
         }
+        return result.score;
     },
     moveLeft: function (blocks, test) {
         //console.log('left');
-        var success = false;
+        var success = false, score = 0;
         for (var y = 0; y < this.block_number; ++y) {
             var left = -1, tmp_tag = 0, tmp_value = 0;
             for (var x = 1; x < this.block_number; ++x) {
@@ -190,9 +191,9 @@ var BlockManager = cc.LayerColor.extend({
                         if (test) {
                             return true;
                         }
-                        this.combineBlocks(blocks, curr_tag, tmp_tag);
+                        score += this.combineBlocks(blocks, curr_tag, tmp_tag);
                         left = i;
-                        success = true;
+                        success += true;
                         break;
                     }
                     else {
@@ -223,11 +224,11 @@ var BlockManager = cc.LayerColor.extend({
                 }
             }
         }
-        return success;
+        return {success: success, score: score};
     },
     moveRight: function (blocks, test) {
         //console.log('right');
-        var success = false;
+        var success = false, score = 0;
         for (var y = 0; y < this.block_number; ++y) {
             var right = this.block_number, tmp_tag = 0, tmp_value = 0;
             for (var x = this.block_number - 2; x >= 0; --x) {
@@ -246,7 +247,7 @@ var BlockManager = cc.LayerColor.extend({
                         if (test) {
                             return true;
                         }
-                        this.combineBlocks(blocks, curr_tag, tmp_tag);
+                        score += this.combineBlocks(blocks, curr_tag, tmp_tag);
                         right = i;
                         success = true;
                         break;
@@ -279,11 +280,11 @@ var BlockManager = cc.LayerColor.extend({
                 }
             }
         }
-        return success;
+        return {success: success, score: score};
     },
     moveUp: function (blocks, test) {
         //console.log('up');
-        var success = false;
+        var success = false, score = 0;
         for (var x = 0; x < this.block_number; ++x) {
             var up = this.block_number, tmp_tag = 0, tmp_value = 0;
             for (var y = this.block_number - 2; y >= 0; --y) {
@@ -302,7 +303,7 @@ var BlockManager = cc.LayerColor.extend({
                         if (test) {
                             return true;
                         }
-                        this.combineBlocks(blocks, curr_tag, tmp_tag);
+                        score += this.combineBlocks(blocks, curr_tag, tmp_tag);
                         up = i;
                         success = true;
                         break;
@@ -335,11 +336,11 @@ var BlockManager = cc.LayerColor.extend({
                 }
             }
         }
-        return success;
+        return {success: success, score: score};
     },
     moveDown: function (blocks, test) {
         //console.log('down');
-        var success = false;
+        var success = false, score = 0;
         for (var x = 0; x < this.block_number; ++x) {
             var down = -1, tmp_tag = 0, tmp_value = 0;
             for (var y = 1; y < this.block_number; ++y) {
@@ -358,7 +359,7 @@ var BlockManager = cc.LayerColor.extend({
                         if (test) {
                             return true;
                         }
-                        this.combineBlocks(blocks, curr_tag, tmp_tag);
+                        score += this.combineBlocks(blocks, curr_tag, tmp_tag);
                         down = i;
                         success = true;
                         break;
@@ -391,6 +392,6 @@ var BlockManager = cc.LayerColor.extend({
                 }
             }
         }
-        return success;
+        return {success: success, score: score};
     }
 });

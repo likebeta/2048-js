@@ -9,14 +9,19 @@ var AppLayer = cc.LayerColor.extend({
 
         var matrix_width = Math.min(sz.width, sz.height);
         var bm = new BlockManager(4, matrix_width, matrix_width);
-        bm.setAnchorPoint(cc.p(0, 0));
+        bm.setAnchorPoint(0, 0);
+        var info = new InfoWrap(bm.getBlockGap(), matrix_width, Math.abs(sz.height - sz.width));
+        info.setAnchorPoint(0, 0);
         if (sz.width > sz.height) {
-            bm.setPosition(cc.p(sz.width - sz.height, 0));
+            bm.setPosition(sz.width - sz.height, 0);
+            info.setPosition(0, 0);
         }
         else {
             bm.setPosition(0, 0);
+            info.setPosition(0, matrix_width);
         }
         this.addChild(bm, 1, 'block_manager');
+        this.addChild(info, 1, 'info_wrap');
 
         // add keyboard listener
         cc.eventManager.addListener({
@@ -25,19 +30,23 @@ var AppLayer = cc.LayerColor.extend({
                 //console.log(cc.formatStr('key %d pressed', keyCode));
                 var node = event.getCurrentTarget();
                 var bm = node.getChildByName('block_manager');
+                var result = false;
                 switch (keyCode) {
                     case 37:
-                        bm.handleAction('left');
+                        result = bm.handleAction('left');
                         break;
                     case 38:
-                        bm.handleAction('up');
+                        result = bm.handleAction('up');
                         break;
                     case 39:
-                        bm.handleAction('right');
+                        result = bm.handleAction('right');
                         break;
                     case 40:
-                        bm.handleAction('down');
+                        result = bm.handleAction('down');
                         break;
+                }
+                if (result) {
+                    info.incrScore(result);
                 }
             }
         }, this);
@@ -54,29 +63,32 @@ var AppLayer = cc.LayerColor.extend({
                 var node = event.getCurrentTarget();
                 var end_pt = touch.getLocation();
                 var prev_pt = node.begin_pt;
-                console.log(cc.formatStr('touch: (%d, %d) -> (%d, %d)', prev_pt.x, prev_pt.y, end_pt.x, end_pt.y));
+                //console.log(cc.formatStr('touch: (%d, %d) -> (%d, %d)', prev_pt.x, prev_pt.y, end_pt.x, end_pt.y));
                 var x_axis = end_pt.x - prev_pt.x;
                 var y_axis = end_pt.y - prev_pt.y;
-                var bm = node.getChildByName('block_manager');
-                var block_gap = bm.getBlockGap();
+                var block_gap = node.getBlockGap();
+                var result = false;
                 if (Math.abs(x_axis) >= Math.abs(y_axis)) {
                     if (x_axis <= -block_gap) {
-                        bm.handleAction("left");
+                        result = node.handleAction("left");
                     }
                     else if (x_axis >= block_gap) {
-                        bm.handleAction("right");
+                        result = node.handleAction("right");
                     }
                 }
                 else {
                     if (y_axis <= -block_gap) {
-                        bm.handleAction("down");
+                        result = node.handleAction("down");
                     }
                     else if (y_axis >= block_gap) {
-                        bm.handleAction("up");
+                        result = node.handleAction("up");
                     }
                 }
+                if (result) {
+                    info.incrScore(result);
+                }
             }
-        }, this);
+        }, bm);
         return true;
     }
 });
@@ -84,7 +96,7 @@ var AppLayer = cc.LayerColor.extend({
 var AppScene = cc.Scene.extend({
     onEnter: function () {
         this._super();
-        var layer = new AppLayer(cc.color(187, 170, 160, 255));
+        var layer = new AppLayer(cc.color(250, 248, 239, 255));
         this.addChild(layer);
     }
 });
