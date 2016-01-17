@@ -78,7 +78,7 @@ var Block = cc.LayerColor.extend({
         return b;
     },
     getValue: function() {
-        return this.value;
+        return this.fake_value;
     },
     getFakeValue: function() {
         return this.fake_value;

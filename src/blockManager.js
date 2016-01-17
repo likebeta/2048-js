@@ -52,6 +52,18 @@ var BlockManager = cc.LayerColor.extend({
         }
         return true;
     },
+    rePlay: function () {
+        if (this.is_animation) {
+            console.log('is animation, rePlay failed');
+            return false;
+        }
+        console.log('rePlay');
+        this.game_over = false;
+        this.is_animation = false;
+        this.free_blocks = [];
+        this.removeAllChildren(true);
+        return this.initBlocks();
+    },
     getFreeBlock: function () {
         var index = rand(10000) % this.free_blocks.length;
         var return_val = this.free_blocks[index];
@@ -122,16 +134,16 @@ var BlockManager = cc.LayerColor.extend({
     handleAction: function (direction) {
         if (this.is_animation) {
             console.log('is animation ...');
-            return;
+            return false;
         }
 
         if (this.game_over == 'lose') {
             console.log('you lost, game over -_-!');
-            return;
+            return false;
         }
         else if (this.game_over == 'win') {
             console.log('you won, game over ^_^!');
-            return;
+            return false;
         }
 
         console.log(direction);
@@ -168,7 +180,7 @@ var BlockManager = cc.LayerColor.extend({
                 }
             }
         }
-        return result.score;
+        return result;
     },
     moveLeft: function (blocks, test) {
         //console.log('left');
@@ -393,5 +405,43 @@ var BlockManager = cc.LayerColor.extend({
             }
         }
         return {success: success, score: score};
+    },
+    snapshoot: function () {
+        var board = [];
+        for (var i = 0; i < this.block_number * this.block_number; ++i) {
+            var b = this.getChildByTag(i);
+            board.push(b.getValue());
+        }
+        return {
+            board: board,
+            game_over: this.game_over,
+            number: this.block_number
+        };
+    },
+    recover: function(info) {
+        if (info.number != this.block_number) {
+            console.log('block number not equal');
+            return false;
+        }
+        if (info.board != undefined) {
+            console.log(cc.formatStr('recover board to %s', info.board.toString()));
+            this.free_blocks = [];
+            for (var i = 0; i < info.board.length; ++i)
+            {
+                var b = this.getChildByTag(i);
+                b.setValue(info.board[i]);
+                if (info.board[i] == 0) {
+                    this.free_blocks.push(i);
+                }
+            }
+        }
+
+        console.log(cc.formatStr('recover free block to %s', this.free_blocks.toString()));
+
+        if (info.game_over != undefined) {
+            this.game_over = Boolean(info.game_over);
+            console.log(cc.formatStr('recover free block to %d', info.game_over));
+        }
+        return true;
     }
 });

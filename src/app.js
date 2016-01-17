@@ -20,8 +20,12 @@ var AppLayer = cc.LayerColor.extend({
             bm.setPosition(0, 0);
             info.setPosition(0, matrix_width);
         }
+
         this.addChild(bm, 1, 'block_manager');
         this.addChild(info, 1, 'info_wrap');
+
+        // load endgame
+        this.loadData();
 
         // add keyboard listener
         cc.eventManager.addListener({
@@ -44,9 +48,19 @@ var AppLayer = cc.LayerColor.extend({
                     case 40:
                         result = bm.handleAction('down');
                         break;
+                    case 6:
+                        console.log('back pressed');
+                        cc.director.end();
+                        break;
+                    case 18:
+                        console.log('menu pressed');
+                        break;
                 }
-                if (result) {
-                    info.incrScore(result);
+                if (result.success) {
+                    if (result.score) {
+                        info.incrScore(result.score);
+                    }
+                    node.saveData();
                 }
             }
         }, this);
@@ -63,32 +77,74 @@ var AppLayer = cc.LayerColor.extend({
                 var node = event.getCurrentTarget();
                 var end_pt = touch.getLocation();
                 var prev_pt = node.begin_pt;
+                var bm = node.getChildByName('block_manager');
                 //console.log(cc.formatStr('touch: (%d, %d) -> (%d, %d)', prev_pt.x, prev_pt.y, end_pt.x, end_pt.y));
                 var x_axis = end_pt.x - prev_pt.x;
                 var y_axis = end_pt.y - prev_pt.y;
-                var block_gap = node.getBlockGap();
+                var block_gap = bm.getBlockGap();
                 var result = false;
                 if (Math.abs(x_axis) >= Math.abs(y_axis)) {
                     if (x_axis <= -block_gap) {
-                        result = node.handleAction("left");
+                        result = bm.handleAction("left");
                     }
                     else if (x_axis >= block_gap) {
-                        result = node.handleAction("right");
+                        result = bm.handleAction("right");
                     }
                 }
                 else {
                     if (y_axis <= -block_gap) {
-                        result = node.handleAction("down");
+                        result = bm.handleAction("down");
                     }
                     else if (y_axis >= block_gap) {
-                        result = node.handleAction("up");
+                        result = bm.handleAction("up");
                     }
                 }
-                if (result) {
-                    info.incrScore(result);
+                if (result.success) {
+                    if (result.score) {
+                        info.incrScore(result.score);
+                    }
+                    node.saveData();
                 }
             }
-        }, bm);
+        }, this);
+        return true;
+    },
+    rePlay: function () {
+        var bm = this.getChildByName('block_manager');
+        if (bm.rePlay()) {
+            var info = this.getChildByName('info_wrap');
+            info.setScore(0);
+            this.saveData();
+        }
+    },
+    loadData: function () {
+        var gamedata = cc.sys.localStorage.getItem('game.2048.data') || '';
+        if (gamedata) {
+            gamedata = JSON.parse(gamedata);
+            console.log(cc.formatStr('load endgame data: %s', gamedata));
+            if (gamedata.score_info) {
+                var info = this.getChildByName('info_wrap');
+                info.recover(gamedata.score_info);
+            }
+            if (gamedata.block_info) {
+                var bm = this.getChildByName('block_manager');
+                bm.recover(gamedata.block_info);
+            }
+        }
+        return true;
+    },
+    saveData: function () {
+        var info = this.getChildByName('info_wrap');
+        var score_info = info.snapshoot();
+        var bm = this.getChildByName('block_manager');
+        var block_info = bm.snapshoot();
+        var gamedata = {
+            score_info: score_info,
+            block_info: block_info
+        };
+        gamedata = JSON.stringify(gamedata);
+        cc.sys.localStorage.setItem('game.2048.data', gamedata);
+        //console.log(cc.formatStr('set game.2048.data to %s', gamedata));
         return true;
     }
 });
