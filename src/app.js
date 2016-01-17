@@ -121,7 +121,6 @@ var AppLayer = cc.LayerColor.extend({
         var gamedata = cc.sys.localStorage.getItem('game.2048.data') || '';
         if (gamedata) {
             gamedata = JSON.parse(gamedata);
-            console.log(cc.formatStr('load endgame data: %s', gamedata));
             if (gamedata.score_info) {
                 var info = this.getChildByName('info_wrap');
                 info.recover(gamedata.score_info);

@@ -424,7 +424,7 @@ var BlockManager = cc.LayerColor.extend({
             return false;
         }
         if (info.board != undefined) {
-            console.log(cc.formatStr('recover board to %s', info.board.toString()));
+            console.log(cc.formatStr('recover board to', info.board));
             this.free_blocks = [];
             for (var i = 0; i < info.board.length; ++i)
             {
@@ -436,11 +436,11 @@ var BlockManager = cc.LayerColor.extend({
             }
         }
 
-        console.log(cc.formatStr('recover free block to %s', this.free_blocks.toString()));
+        console.log(cc.formatStr('recover free block to', this.free_blocks));
 
         if (info.game_over != undefined) {
             this.game_over = Boolean(info.game_over);
-            console.log(cc.formatStr('recover free block to %d', info.game_over));
+            console.log(cc.formatStr('recover free block to', info.game_over));
         }
         return true;
     }

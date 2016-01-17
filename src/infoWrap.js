@@ -80,11 +80,11 @@ var InfoWrap = cc.LayerColor.extend({
     },
     recover: function(info) {
         if (info.high_score) {
-            console.log(cc.formatStr('recover high score to %d', info.high_score));
+            console.log(cc.formatStr('recover high score to', info.high_score));
             this.setHighScore(info.high_score);
         }
         if (info.score) {
-            console.log(cc.formatStr('recover score to %d', info.score));
+            console.log(cc.formatStr('recover score to', info.score));
             this.setScore(info.score);
         }
         return true;
